@@ -1,0 +1,34 @@
+{
+  "name": "wtd-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha ./tests/**.js || true",
+    "lint": "node_modules/.bin/eslint public/**.js lib/**.js tests/**.js **.js || true",
+    "lintf": "node_modules/.bin/eslint public/**.js lib/**.js tests/**.js **.js  --fix || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pescel/wtd-api.git"
+  },
+  "author": "Lauren Pesce",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pescel/wtd-api/issues"
+  },
+  "homepage": "https://github.com/pescel/wtd-api#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "bookshelf": "0.10.2",
+    "express": "^4.15.2",
+    "knex": "^0.12.8",
+    "md5": "^2.2.1",
+    "pg": "^6.1.4"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.2.0"
+  }
+}
