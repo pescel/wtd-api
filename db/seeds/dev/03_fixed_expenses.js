@@ -4,13 +4,13 @@ exports.seed = function(knex, Promise) {
       id: 1,
       type: 'rent',
       amount: 50000,
-      user_id: 2
+      user_id: 1
     }),
     knex('fixed_expenses').insert({
       id: 2,
       type: 'netflix',
       amount: 1200,
-      user_id: 3
+      user_id: 2
     })
   ]);
 };
