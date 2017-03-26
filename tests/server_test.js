@@ -52,7 +52,11 @@ describe('GET /users', () => {
       expect(res).to.have.status(200);
       expect(res).to.be.json;
       expect(res.body).to.be.a('array');
-      expect(res.body.last_name).to.be('Lemon');
+      expect(res.body[0]).to.have.property('first_name');
+      expect(res.body[0]).to.have.property('last_name');
+      expect(res.body[0]).to.have.property('email');
+      expect(res.body[0]).to.have.property('password');
+      expect(res.body[0]).to.have.property('monthly_income');
       done();
     });
   });
@@ -160,7 +164,7 @@ describe('GET /fixed_expenses', () => {
   });
 });
 
-describe('GET /users/1', () => {
+describe('GET /users/:id', () => {
   beforeEach((done) => {
     user = [
       {
@@ -174,7 +178,7 @@ describe('GET /users/1', () => {
         first_name: 'Rick',
         last_name: 'Nash',
         email: 'rnashnyc@nyrangers.com',
-        password: 'iluvhockey',
+        password: 'madisonsq',
         monthly_income: 930000
       }
     ]
@@ -190,7 +194,6 @@ describe('GET /users/1', () => {
     it('should display users', (done) => {
       chai.request(app)
       .get('/users/1')
-      .send({id: 1})
       .end((err, res) => {
         if (err) { done(err); }
         expect(res).to.have.status(200);
@@ -209,7 +212,7 @@ describe('GET /users/1', () => {
   context('user is not found', () => {
     it('should return a 404', (done) => {
       chai.request(app)
-      .get('/users/1')
+      .get('/users/68')
       .end(function(err, res) {
         expect(res).to.have.status(404);
         expect(res.body).to.be.a('object');
@@ -219,10 +222,9 @@ describe('GET /users/1', () => {
   });
 });
 
-describe('PUT /users/1', () => {
+describe('PUT /users/:id', () => {
   afterEach((done) => {
     app.locals.user = [{
-      id: 12,
       first_name: 'Clementine',
       last_name: 'Kruczynski',
       email: 'agentorange@aol.com',
@@ -252,7 +254,7 @@ describe('PUT /users/1', () => {
   context('if user is not found', () => {
     it('should have a 404 error status', (done) => {
       chai.request(app)
-      .get('/users/1')
+      .get('/users/83')
       .end(function(err, res) {
         expect(res).to.have.status(404);
         expect(res.body).to.be.a('object');
@@ -262,17 +264,15 @@ describe('PUT /users/1', () => {
   });
 });
 
-describe('GET /users/1/credit_cards', () => {
+describe('GET /users/:user_id/credit_cards', () => {
   beforeEach((done) => {
     const userCard = [
       {
-        id: 1,
         type: 'MasterCard',
         user_id: 1,
         last_four: '8080'
       },
       {
-        id: 2,
         type: 'Visa',
         user_id: 2,
         last_four: '0808'
@@ -289,7 +289,6 @@ describe('GET /users/1/credit_cards', () => {
     it('should display users credit cards', function(done) {
       chai.request(app)
       .get('/users/1/credit_cards')
-      .send({id: 1})
       .end((err, res) => {
         if (err) { done(err); }
         expect(res).to.have.status(200);
@@ -305,7 +304,7 @@ describe('GET /users/1/credit_cards', () => {
   context('if user is not found', () => {
     it('should return 404 status', (done) => {
       chai.request(app)
-      .get('/users/1/credit_cards')
+      .get('/users/33/credit_cards')
       .end(function(err, res) {
         expect(res).to.have.status(404);
         expect(res.body).to.be.a('object');
@@ -315,17 +314,15 @@ describe('GET /users/1/credit_cards', () => {
   });
 });
 
-describe('GET /users/1/fixed_expenses', () => {
+describe('GET /users/:user_id/fixed_expenses', () => {
   beforeEach((done) => {
     const userExpense = [
       {
-        id: 1,
         type: 'amazon prime',
         amount: 1000,
         user_id: 1
       },
       {
-        id: 2,
         type: 'car payment',
         amount: 30000,
         user_id: 2
@@ -358,7 +355,7 @@ describe('GET /users/1/fixed_expenses', () => {
   context('if users expense is not found', () => {
     it('should return 404 status', (done) => {
       chai.request(app)
-      .get('/users/1/fixed_expenses')
+      .get('/users/38/fixed_expenses')
       .end(function(err, res) {
         expect(res).to.have.status(404);
         expect(res.body).to.be.a('object');
@@ -368,7 +365,7 @@ describe('GET /users/1/fixed_expenses', () => {
   });
 });
 
-describe('POST /users/1/fixed_expenses', () => {
+describe('POST /users/:user_id/fixed_expenses', () => {
   afterEach((done) => {
     app.locals.expense = [{
       type: 'landscaping',
@@ -398,7 +395,7 @@ describe('POST /users/1/fixed_expenses', () => {
   context('if user is not found', () => {
     it('should return 404 status', (done) => {
       chai.request(app)
-      .get('/users/1/fixed_expenses')
+      .get('/users/28/fixed_expenses')
       .end(function(err, res) {
         expect(res).to.have.status(404);
         expect(res.body).to.be.a('object');
@@ -502,7 +499,8 @@ describe('PUT /credit_cards/1', () => {
         res.should.have.status(200);
         res.should.be.json;
         res.body.should.be.a('object');
-        expect(res.body[0]).to.have.property('type');
+        res.body.should.have.property('name');
+
         done();
       });
     });
@@ -515,8 +513,22 @@ describe('PUT /credit_cards/1', () => {
       .end(function(err, res) {
         expect(res).to.have.status(404);
         expect(res.body).to.be.a('object');
+        res.body.should.have.property('last_four');
         done();
       });
+    });
+  });
+});
+
+describe.only('DELETE /transactions/:id', () => {
+  it('should delete a transaction', (done) => {
+    chai.request(app)
+    .delete('/transactions/1')
+    .end((err, res) => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('object');
+      expect(res.body).to.have.property('');
     });
   });
 });
