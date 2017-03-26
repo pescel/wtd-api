@@ -22,8 +22,8 @@ app.get('/users', (request, response) => {
   })
   .catch((error) => {
     response.status(500).send(error);
-  })
-})
+  });
+});
 
 app.get('/credit_cards', (request, response) => {
   database('credit_cards').select()
@@ -32,18 +32,18 @@ app.get('/credit_cards', (request, response) => {
   })
   .catch((error) => {
     response.status(500).send(error);
-  })
-})
+  });
+});
 
 app.get('/fixed_expenses', (request, response) => {
   database('fixed_expenses').select()
   .then((fixed_expenses) => {
-    reponse.send(fixed_expenses);
+    response.send(fixed_expenses);
   })
   .catch((error) => {
     response.status(500).send(error)
-  })
-})
+  });
+});
 
 // Retrieve a specific user
 app.get('/users/:id', (request, response) => {
@@ -52,10 +52,11 @@ app.get('/users/:id', (request, response) => {
     response.send(user);
   })
   .catch((error) => {
-    console.log(error);
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.get('/users/:user_id/credit_cards', (request, response) => {
   database('credit_cards').where('user_id', request.params.user_id).select()
@@ -63,9 +64,11 @@ app.get('/users/:user_id/credit_cards', (request, response) => {
     response.send(credit_cards);
   })
   .catch((error) => {
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.get('/users/:user_id/transactions', (request, response) => {
   database('transactions').where('user_id', request.params.user_id).select()
@@ -73,9 +76,11 @@ app.get('/users/:user_id/transactions', (request, response) => {
     response.send(transactions);
   })
   .catch((error) => {
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.get('/users/:user_id/fixed_expenses', (request, response) => {
   database('fixed_expenses').where('user_id', request.params.user_id).select()
@@ -83,47 +88,50 @@ app.get('/users/:user_id/fixed_expenses', (request, response) => {
     response.send(fixed_expenses);
   })
   .catch((error) => {
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 // Create a new user
 app.post('/users', (request, response) => {
   let user = request.body
 
-  database('users').insert(user)
+  database('users').insert(user).returning('*')
   .then((user) => {
     response.status(200).send(user);
   })
   .catch((error) => {
     response.status(500).send(error);
-  })
-})
+  });
+});
 
 app.post('/credit_cards', (request, response) => {
   let creditCard = request.body
 
-  database('credit_cards').insert(creditCard)
+  database('credit_cards').insert(creditCard).returning('*')
   .then((creditCard) => {
     response.status(200).send(creditCard);
   })
   .catch((error) => {
-    response.status(500).send(error);
-  })
-})
+      response.status(500).send(error)
+  });
+});
 
 app.post('/users/:user_id/fixed_expenses', (request, response) => {
   let expense = request.body
   expense.user_id = request.params.user_id
-
-  database('fixed_expenses').insert(expense)
+  database('fixed_expenses').insert(expense).returning("*")
   .then((expense) => {
     response.status(200).send(expense);
   })
   .catch((error) => {
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 // Update a specific user
 app.put('/users/:id', (request, response) => {
@@ -135,9 +143,11 @@ app.put('/users/:id', (request, response) => {
     response.send(user);
   })
   .catch((error) => {
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.put('/fixed_expenses/:id', (request, response) => {
   let expense = request.body
@@ -147,10 +157,12 @@ app.put('/fixed_expenses/:id', (request, response) => {
     .then(() => {
       response.send(expense);
     })
-    .catch((error) => {
-      response.status(500).send(error);
-  })
-})
+  .catch((error) => {
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.put('/credit_cards/:id', (request, response) => {
   let card = request.body
@@ -160,10 +172,12 @@ app.put('/credit_cards/:id', (request, response) => {
     .then(() => {
       response.send(card);
     })
-    .catch((error) => {
-      response.status(500).send(error);
-    })
-})
+  .catch((error) => {
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 // Updates a specific fixed_expense row
 app.put('/fixed_expenses/:id', (request, response) => {
@@ -175,9 +189,11 @@ app.put('/fixed_expenses/:id', (request, response) => {
     response.send(expense);
   })
   .catch(function(error) {
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 // Destroy a specific user
 app.delete('/transactions/:id', (request, response) => {
@@ -187,9 +203,11 @@ app.delete('/transactions/:id', (request, response) => {
     response.send(request.params.id);
   })
   .catch((error) => {
-    response.status(500).send(error);
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.delete('/fixed_expenses/:id', (request, response) => {
   database('fixed_expenses').where('id', request.params.id)
@@ -198,9 +216,11 @@ app.delete('/fixed_expenses/:id', (request, response) => {
     response.send(request.params.id);
   })
   .catch((error) => {
-    response.status(500).send(error)
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.delete('/credit_cards/:id', (request, response) => {
   database('fixed_expenses').where('credit_card_id', request.params.id)
@@ -212,9 +232,11 @@ app.delete('/credit_cards/:id', (request, response) => {
     response.send(request.params.id);
   })
   .catch((error) => {
-    response.status(500).send(error)
-  })
-})
+    if(response == undefined) {
+      response.status(404).send(error)
+    }
+  });
+});
 
 app.listen(app.get('port'), () => {
   console.log(`running on ${app.get('port')}.`);
