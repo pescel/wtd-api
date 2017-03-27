@@ -18,22 +18,6 @@ exports.seed = function(knex, Promise) {
     }),
     knex('users').insert({
       id: 3,
-      first_name: 'Nicholas',
-      last_name: 'Sanchez',
-      email: 'nsanchez0@wordpress.com',
-      password: 'Ydw0rJzm',
-      monthly_income: 45000
-    }),
-    knex('users').insert({
-      id: 4,
-      first_name: 'Diana',
-      last_name: 'Hunt',
-      email: 'dhunt1@bandcamp.com',
-      password: 'UH1OQW5yG',
-      monthly_income: 760000
-    }),
-    knex('users').insert({
-      id: 3,
       first_name: 'Jacqueline',
       last_name: 'Wells',
       email: 'jwells2@pinterest.com',
@@ -166,7 +150,7 @@ exports.seed = function(knex, Promise) {
       last_name: 'Harrison',
       email: 'jharrisoni@facebook.com',
       password: 'HDeyORU5dClt',
-      montly_income: 280000
+      monthly_income: 280000
     }),
     knex('users').insert({
       id: 20,
@@ -214,7 +198,7 @@ exports.seed = function(knex, Promise) {
       last_name: 'Ray',
       email: 'irayo@over-blog.com',
       password: 'UtJgd8c',
-      montly_income: 150000
+      monthly_income: 150000
     }),
     knex('users').insert({
       id: 26,
@@ -255,6 +239,6 @@ exports.seed = function(knex, Promise) {
       email: 'grobinsont@china.com.cn',
       password: 'fDSm3Izll3dA',
       monthly_income: 640000
-    }]
+    })
   ]);
 };
