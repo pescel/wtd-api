@@ -108,7 +108,7 @@ describe('GET /credit_cards', () => {
       }
     ]
     database('credit_cards').insert(cards)
-      done();
+    done();
   });
 
   it('should return all credit cards', (done) => {
@@ -184,7 +184,7 @@ describe('GET /users/:id', () => {
     ]
 
     database('users').insert(user)
-     done();
+    done();
   });
   afterEach((done) => {
     done();
@@ -264,6 +264,62 @@ describe('PUT /users/:id', () => {
   });
 });
 
+describe('GET /users/:user_id/transactions', () => {
+  beforeEach((done) => {
+    const transactions = [
+      {
+        date: '2017-04-05',
+        description: 'booze',
+        credit_card_id: 1,
+        user_id: 1,
+      },
+      {
+        date: '2017-04-06',
+        description: 'crackers',
+        credit_card_id: 1,
+        user_id: 1,
+      },
+      {
+        date: '2017-04-06',
+        description: 'cheez',
+        credit_card_id: 1,
+        user_id: 1,
+      }
+    ]
+    database('transactions').insert(transactions)
+    .then(() => { done() })
+  });
+
+  it('should return all of a users transactions', function(done) {
+    chai.request(app)
+    .get('/users/1/transactions')
+    .end((err, res) => {
+      if (err) { done(err); }
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      expect(res.body[0]).to.have.property('date');
+      expect(res.body[0]).to.have.property('description');
+      done();
+    });
+  });
+
+  it('should be able to query a specific date', function(done) {
+    chai.request(app)
+    .get('/users/1/transactions')
+    .query({date: "2017-04-06"})
+    .end((err, res) => {
+      if (err) { done(err); }
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      expect(res.body[0]).to.have.property('date');
+      expect(res.body[0]).to.have.property('description');
+      done();
+    });
+  });
+});
+
 describe('GET /users/:user_id/credit_cards', () => {
   beforeEach((done) => {
     const userCard = [
@@ -279,9 +335,6 @@ describe('GET /users/:user_id/credit_cards', () => {
       }
     ]
     database('credit_cards').insert(userCard)
-    done();
-  });
-  afterEach((done) => {
     done();
   });
 
@@ -382,12 +435,12 @@ describe('POST /users/:user_id/fixed_expenses', () => {
       .send({type: 'hulu', amount: 1400})
       .end((err, res) => {
         if(err) { done(err); }
-          expect(res).to.have.status(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('array');
-          expect(res.body[0]).to.have.property('type');
-          expect(res.body[0].type).to.equal('hulu');
-          done();
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('array');
+        expect(res.body[0]).to.have.property('type');
+        expect(res.body[0].type).to.equal('hulu');
+        done();
       });
     });
   });
@@ -405,7 +458,7 @@ describe('POST /users/:user_id/fixed_expenses', () => {
   });
 });
 
-describe('PUT /fixed_expenses/1', () => {
+describe('PUT /fixed_expenses/:id', () => {
   afterEach( (done) => {
     app.locals.expense = [{
       id: 1,
@@ -476,16 +529,7 @@ describe('POST /credit_cards', () => {
   });
 });
 
-describe('PUT /credit_cards/1', () => {
-  afterEach((done) => {
-    app.locals.card = [{
-      id: 1,
-      type: 'Capitol One',
-      user_id: 1,
-      last_four: 3333
-    }]
-    done();
-  });
+describe('PUT /credit_cards/:id', () => {
 
   context('if credit card is valid', () => {
     it.skip('should update a credit card', (done) => {
@@ -509,26 +553,41 @@ describe('PUT /credit_cards/1', () => {
   context('if credit card is not found', () => {
     it('should return a 404 status', (done) => {
       chai.request(app)
-      .get('/credit_cards/1')
+      .get('/credit_cards/999')
       .end(function(err, res) {
         expect(res).to.have.status(404);
-        expect(res.body).to.be.a('object');
-        res.body.should.have.property('last_four');
         done();
       });
     });
   });
 });
 
-describe.only('DELETE /transactions/:id', () => {
+describe('DELETE /transactions/:id', () => {
+  let transaction = null
+
+  beforeEach((done) => {
+    const t = {
+        date: '2017-04-05',
+        description: 'booze',
+        credit_card_id: 1,
+        user_id: 1,
+      }
+    database('transactions').insert(t).returning('*')
+    .then((transactions) => {
+      transaction = transactions[0]
+      done()
+    })
+  });
+
   it('should delete a transaction', (done) => {
     chai.request(app)
-    .delete('/transactions/1')
+    .delete(`/transactions/${transaction.id}`)
     .end((err, res) => {
       expect(res).to.have.status(200);
       expect(res).to.be.json;
       expect(res.body).to.be.a('object');
-      expect(res.body).to.have.property('');
+      expect(res.body).to.have.property('date');
+      done()
     });
   });
 });

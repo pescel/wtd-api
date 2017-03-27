@@ -63,7 +63,6 @@ app.get('/users/:id', (request, response) => {
 app.get('/users/:user_id/credit_cards', (request, response) => {
   database('credit_cards').where('user_id', request.params.user_id).select()
   .then((credit_cards) => {
-    console.log(credit_cards)
     if(credit_cards.length == 0) {
       response.sendStatus(404)
     } else {
@@ -76,12 +75,17 @@ app.get('/users/:user_id/credit_cards', (request, response) => {
 });
 
 app.get('/users/:user_id/transactions', (request, response) => {
-  database('transactions').where('user_id', request.params.user_id).select()
-  .then((transactions) => {
-    if(user.length == 0) {
+  let query = database('transactions')
+  .where('user_id', request.params.user_id)
+  .select()
+  if(request.query.date != undefined) {
+    query.where('date', request.query.date)
+  }
+  query.then((transactions) => {
+    if(transactions.length == 0) {
       response.sendStatus(404)
     } else {
-      response.send(user);
+      response.send(transactions);
     }
   })
   .catch((error) => {
@@ -208,17 +212,16 @@ app.put('/fixed_expenses/:id', (request, response) => {
   });
 });
 
-// Destroy a specific user
+// Destroy a specific transaction
 app.delete('/transactions/:id', (request, response) => {
   database('transactions').where('id', request.params.id)
-  .del()
-  .then(() => {
-    response.send(request.params.id);
+  .del().returning('*')
+  .then((transactions) => {
+    response.send(transactions[0]);
   })
   .catch((error) => {
-    if(response == undefined) {
-      response.status(404).send(error)
-    }
+    console.log(error);
+    response.status(500).send(error)
   });
 });
 
@@ -245,11 +248,14 @@ app.delete('/credit_cards/:id', (request, response) => {
     response.send(request.params.id);
   })
   .catch((error) => {
-    if(response == undefined) {
-      response.status(404).send(error)
-    }
+    response.status(404).send(error)
   });
 });
+
+app.use((request, response) => {
+  console.log('Routing error')
+  response.sendStatus(404)
+})
 
 app.listen(app.get('port'), () => {
   console.log(`running on ${app.get('port')}.`);
