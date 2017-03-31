@@ -563,7 +563,7 @@ describe('PUT /credit_cards/:id', () => {
 });
 
 describe('DELETE /transactions/:id', () => {
-  let transaction = null
+  // let transaction = null
 
   beforeEach((done) => {
     const t = {
